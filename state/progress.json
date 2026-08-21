@@ -1,9 +1,9 @@
 {
   "version": 2,
   "setup": {
-    "estado": "pendiente",
-    "remote": null,
-    "completado_en": null
+    "estado": "completado",
+    "remote": "https://github.com/gjoiver/tutor-pgn-arquitectura-soluciones.git",
+    "completado_en": "2026-08-20"
   },
   "diagnostico": {
     "estado": "pendiente",
