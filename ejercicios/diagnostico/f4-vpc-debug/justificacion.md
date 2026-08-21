@@ -1,0 +1,3 @@
+1. Es una limitación de AWS, este no permite asociar Security Groups directamente a un NAT Gateway administrado
+2. Para una subred que debe ser privada, el recurso que debe apuntar es al NAT Gateway que se encuentra en la subred publica, la cual esta se conecta a internet por medio de Internet Gateway
+3. Esta permitiendo entradas desde cualquiera de internet por lo que ahora apunta a la ip privada de la subred privada

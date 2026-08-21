@@ -6,9 +6,15 @@
     "completado_en": "2026-08-20"
   },
   "diagnostico": {
-    "estado": "pendiente",
+    "estado": "en_curso",
     "completado_en": null,
-    "notas": []
+    "notas": [
+      "Autoevaluacion inicial: F1-F5 parcial, F6 ninguna, F7 no, F8 no.",
+      "F5 verificado y reprobado: 3 preguntas conceptuales (JWT alg=none, hashing sin sal, STRIDE de un IDOR) respondidas 'no se'. Sin evidencia de conocimiento real. Candidato a no_visto en el cierre.",
+      "F4 verificado, resultado mixto (candidato a 'visto'): confusion real entre route tables y security groups en diseno de VPC; explicacion superficial de RDS gestionado; Lambda vs EC2 por patron de carga solido. Ejercicio ejercicios/diagnostico/f4-vpc-debug corregido pero con 2 rondas de pistas especificas (incluyendo nat_gateway_id vs gateway_id dado directamente).",
+      "F3 en verificacion: conceptual completado (patrones de resiliencia bien nombrados pero orden de interaccion confundido; monolito modular vs microservicios solido; ADR - confundio 'alternativas descartadas' con trade-offs de atributos de calidad). Ejercicio de codigo ejercicios/diagnostico/f3-resiliencia pendiente de completar por el estudiante.",
+      "Pendiente verificar F2 y F1 (parcial) tras cerrar F3."
+    ]
   },
   "posicion_actual": null,
   "fortalezas": [],
