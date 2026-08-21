@@ -1,0 +1,457 @@
+# Roadmap de Arquitectura de Soluciones para el Estado colombiano — versión estructurada para el tutor.
+# La versión humana está en docs/roadmap.md.
+
+meta:
+  version: 1
+  horas_totales_estimadas: 465
+  reglas:
+    - "Orden por defecto: secuencial (tópicos dentro de la fase, fases en orden)."
+    - "prerequisitos solo se listan cuando cruzan fases o rompen el orden por defecto."
+    - "tipo: codigo (ejercicio de producción obligatorio) | mixto (producción + diseño) | conceptual (ejercicio de diseño escrito)."
+    - "El estado del estudiante NO vive aquí: vive en state/progress.json."
+
+fases:
+  - id: f1
+    nombre: "Datos: modelado y gestión de bases de datos"
+    horas: 50
+    certificacion_ancla: null
+    criterio_dominio_fase: >
+      Entregar el modelo de datos de un sistema de trámites con al menos 12 entidades en sus tres
+      niveles (conceptual, lógico, físico), con el script DDL ejecutable, 5 consultas SQL no
+      triviales que respondan preguntas de negocio, y una prueba documentada de respaldo y
+      restauración completa.
+    capstone: "Modelo de datos del sistema de gestión de expedientes en tres niveles, con expedientes, actuaciones, sujetos procesales y trazabilidad; respaldo y restauración probados."
+    topicos:
+      - id: f1.modelo-er
+        nombre: "Modelado entidad-relación en tres niveles"
+        tipo: mixto
+        conceptos: ["entidades y atributos", "cardinalidades", "modelo conceptual", "modelo lógico", "modelo físico"]
+        tecnologias: ["dbdiagram", "PostgreSQL"]
+        criterio_dominio: "Entregar el modelo de un dominio de trámites con al menos 8 entidades en los tres niveles, y explicar por escrito qué cambia entre cada nivel y por qué."
+      - id: f1.normalizacion
+        nombre: "Normalización y desnormalización deliberada"
+        tipo: mixto
+        conceptos: ["1FN", "2FN", "3FN", "anomalías de actualización", "desnormalización por desempeño"]
+        tecnologias: ["PostgreSQL"]
+        criterio_dominio: "Tomar un esquema desnormalizado dado, llevarlo a 3FN con el DDL ejecutable, y justificar en un ADR una desnormalización deliberada con su costo asumido."
+      - id: f1.sql-consultas
+        nombre: "SQL de consulta y desempeño"
+        tipo: codigo
+        conceptos: ["joins", "agregaciones", "subconsultas", "CTE", "vistas", "índices", "plan de ejecución"]
+        tecnologias: ["PostgreSQL", "psql", "EXPLAIN ANALYZE"]
+        criterio_dominio: "Escribir 5 consultas que respondan preguntas de negocio sobre el modelo de trámites y optimizar una de ellas con un índice, mostrando el plan de ejecución antes y después."
+      - id: f1.transacciones-acid
+        nombre: "Transacciones, ACID y concurrencia"
+        tipo: codigo
+        conceptos: ["atomicidad", "consistencia", "aislamiento", "durabilidad", "niveles de aislamiento", "bloqueos", "lectura sucia y fantasma"]
+        tecnologias: ["PostgreSQL", "psql"]
+        criterio_dominio: "Reproducir en dos sesiones concurrentes una anomalía de aislamiento, documentar qué nivel la permite y corregirla cambiando el nivel o el bloqueo."
+      - id: f1.relacional-vs-nosql
+        nombre: "Criterios de elección relacional vs NoSQL"
+        tipo: conceptual
+        conceptos: ["documental", "clave-valor", "columnar", "teorema CAP", "patrones de acceso", "consistencia eventual"]
+        tecnologias: []
+        criterio_dominio: "Escribir una decisión razonada para tres casos de uso distintos, indicando motor elegido, patrón de acceso que lo justifica y qué se pierde con la alternativa descartada."
+      - id: f1.respaldo-restauracion
+        nombre: "Respaldo, restauración y recuperación"
+        tipo: codigo
+        conceptos: ["respaldo completo e incremental", "point-in-time recovery", "verificación de integridad", "RPO a nivel de datos"]
+        tecnologias: ["pg_dump", "pg_restore", "Docker"]
+        criterio_dominio: "Ejecutar un ciclo completo de respaldo, destrucción y restauración de la base, y documentar el RPO real medido en el ejercicio."
+      - id: f1.gobierno-datos
+        nombre: "Gobierno de datos y ciclo de vida del dato"
+        tipo: conceptual
+        conceptos: ["calidad de datos", "metadatos", "diccionario de datos", "catálogo", "linaje", "ciclo de vida del dato"]
+        tecnologias: []
+        criterio_dominio: "Producir el diccionario de datos del modelo de trámites con reglas de calidad verificables por campo y la política de retención de cada entidad."
+  - id: f2
+    nombre: "Sistemas operativos, redes e infraestructura"
+    horas: 45
+    certificacion_ancla: null
+    criterio_dominio_fase: >
+      Desplegar una API en contenedores detrás de un proxy inverso con HTTPS, en una red con
+      segmentación pública/privada, y entregar un diagrama de red del montaje más un documento de 1
+      página que defina RTO y RPO objetivo y justifique cómo el diseño los sostiene.
+    capstone: "Despliegue del sistema en contenedores con red segmentada, HTTPS y objetivos de RTO/RPO declarados."
+    topicos:
+      - id: f2.linux-operacion
+        nombre: "Operación de Linux y diagnóstico"
+        tipo: codigo
+        conceptos: ["sistema de archivos", "permisos", "procesos", "servicios systemd", "logs", "shell scripting"]
+        tecnologias: ["Linux", "bash", "journalctl"]
+        criterio_dominio: "Escribir un script que recolecte estado de servicios, uso de disco y últimos errores del log, y ejecutarlo sobre un contenedor con un servicio deliberadamente caído hasta diagnosticar la causa."
+      - id: f2.tcp-ip-http-tls
+        nombre: "Protocolos de red, HTTP y TLS"
+        tipo: mixto
+        conceptos: ["modelo OSI y TCP/IP", "DNS", "HTTP/HTTPS", "handshake TLS", "certificados", "puertos y sockets"]
+        tecnologias: ["dig", "curl", "openssl", "ss"]
+        criterio_dominio: "Trazar una petición HTTPS de extremo a extremo con herramientas de línea de comandos y explicar por escrito qué pasa en cada capa, incluyendo qué valida exactamente el certificado."
+      - id: f2.redes-segmentacion
+        nombre: "Direccionamiento, subredes, firewalls e IPv6"
+        tipo: mixto
+        conceptos: ["CIDR", "subredes", "enrutamiento", "NAT", "reglas de firewall", "IPv6 en entidades públicas"]
+        tecnologias: ["Docker networks", "iptables o nftables"]
+        criterio_dominio: "Diseñar el plan de direccionamiento de una red con segmento público y privado, implementarlo con redes de contenedores y demostrar que el segmento privado no es alcanzable desde fuera."
+      - id: f2.alta-disponibilidad
+        nombre: "Balanceo, alta disponibilidad y tolerancia a fallos"
+        tipo: conceptual
+        conceptos: ["balanceo de carga", "proxy inverso", "redundancia", "punto único de falla", "failover", "salud de servicio"]
+        tecnologias: ["Nginx"]
+        criterio_dominio: "Identificar en un diagrama de arquitectura dado todos los puntos únicos de falla y proponer para cada uno una mitigación con su costo asociado."
+      - id: f2.contenedores
+        nombre: "Contenedores y orquestación"
+        tipo: codigo
+        conceptos: ["imágenes y capas", "registries", "volúmenes", "redes de contenedores", "virtualización vs contenedores", "orquestación"]
+        tecnologias: ["Docker", "Docker Compose", "Nginx"]
+        criterio_dominio: "Levantar con Compose una aplicación en dos réplicas detrás de un proxy inverso con HTTPS, y demostrar que el servicio sigue respondiendo al detener una réplica."
+      - id: f2.modelos-servicio
+        nombre: "Modelos de servicio y de despliegue"
+        tipo: conceptual
+        conceptos: ["IaaS", "PaaS", "SaaS", "on-premise", "nube pública", "híbrido", "responsabilidad por modelo"]
+        tecnologias: []
+        criterio_dominio: "Clasificar cinco soluciones reales según modelo de servicio y despliegue, y sustentar para una entidad pública cuál corresponde a un sistema misional y por qué."
+      - id: f2.rto-rpo-datacenter
+        nombre: "Centro de datos, RTO y RPO"
+        tipo: conceptual
+        conceptos: ["cómputo", "almacenamiento", "respaldo", "energía y refrigeración", "RTO", "RPO", "niveles de servicio"]
+        tecnologias: []
+        criterio_dominio: "Definir RTO y RPO objetivo para tres servicios de criticidad distinta y justificar el diseño de infraestructura que sostiene cada par de valores."
+  - id: f3
+    nombre: "Diseño de software y patrones de arquitectura"
+    horas: 70
+    certificacion_ancla: null
+    criterio_dominio_fase: >
+      Producir el documento de arquitectura de una solución con al menos 3 componentes integrados:
+      diagramas C4 de contexto, contenedores y componentes; especificación OpenAPI de las interfaces;
+      y 5 ADR que registren decisiones reales con sus alternativas descartadas y el trade-off
+      aceptado. Debe incluir un ADR que elija explícitamente no usar microservicios y sustente por
+      qué.
+    capstone: "Documento de arquitectura con vistas C4, contratos OpenAPI, integración asíncrona y bitácora de ADR."
+    topicos:
+      - id: f3.atributos-calidad
+        nombre: "Atributos de calidad y trade-offs"
+        tipo: conceptual
+        conceptos: ["disponibilidad", "escalabilidad", "mantenibilidad", "seguridad", "desempeño", "portabilidad", "escenarios de calidad"]
+        tecnologias: []
+        criterio_dominio: "Escribir seis escenarios de calidad en formato estímulo-respuesta-medida para un sistema dado, y demostrar con dos de ellos que optimizar uno degrada al otro."
+      - id: f3.estilos-arquitectonicos
+        nombre: "Estilos arquitectónicos y criterios de elección"
+        tipo: conceptual
+        conceptos: ["monolito", "monolito modular", "n-capas", "SOA", "microservicios", "event-driven", "serverless"]
+        tecnologias: []
+        criterio_dominio: "Elegir estilo para tres contextos distintos (equipo pequeño, sistema legado, alta variabilidad de carga) y sustentar cada elección contra dos alternativas descartadas."
+      - id: f3.diseno-apis
+        nombre: "Diseño de APIs y contract-first"
+        tipo: codigo
+        conceptos: ["REST", "versionado", "idempotencia", "paginación", "códigos de estado", "API Gateway", "GraphQL y gRPC"]
+        tecnologias: ["OpenAPI", "Swagger Editor"]
+        criterio_dominio: "Especificar en OpenAPI una API de expedientes con versionado, paginación y operaciones idempotentes, validar el contrato y generar el cliente o servidor desde él."
+      - id: f3.integracion-asincrona
+        nombre: "Integración asíncrona y mensajería"
+        tipo: codigo
+        conceptos: ["colas", "tópicos", "publicación-suscripción", "entrega al menos una vez", "idempotencia del consumidor", "cola de mensajes muertos"]
+        tecnologias: ["RabbitMQ", "Docker Compose"]
+        criterio_dominio: "Implementar un productor y un consumidor con reintentos y cola de mensajes muertos, y demostrar que un mensaje duplicado no produce efecto duplicado."
+      - id: f3.patrones-resiliencia
+        nombre: "Patrones de diseño y de resiliencia"
+        tipo: codigo
+        conceptos: ["fábrica", "estrategia", "repositorio", "adaptador", "circuit breaker", "bulkhead", "timeout", "retry con backoff"]
+        tecnologias: ["Python o Java"]
+        criterio_dominio: "Implementar un cliente de servicio externo con timeout, reintento con backoff y circuit breaker, y demostrar con un servicio simulado que el circuito abre y se recupera."
+      - id: f3.arquitectura-limpia
+        nombre: "Arquitectura limpia y hexagonal"
+        tipo: codigo
+        conceptos: ["separación dominio-infraestructura", "puertos y adaptadores", "inversión de dependencias", "testabilidad del dominio"]
+        tecnologias: ["Python o Java"]
+        criterio_dominio: "Refactorizar un módulo acoplado a la base de datos hacia puertos y adaptadores, y demostrar que la lógica de dominio se prueba sin levantar la base."
+      - id: f3.documentacion-c4-adr
+        nombre: "Documentación de arquitectura con C4 y ADR"
+        tipo: mixto
+        conceptos: ["vista de contexto", "vista de contenedores", "vista de componentes", "diagrama de despliegue", "ADR", "alternativas descartadas"]
+        tecnologias: ["Structurizr o PlantUML", "Mermaid"]
+        criterio_dominio: "Producir las tres vistas C4 del sistema y cinco ADR, uno de los cuales debe decidir explícitamente no usar microservicios con su sustento."
+      - id: f3.mantenimiento-legado
+        nombre: "Mantenimiento y modernización de legado"
+        tipo: conceptual
+        conceptos: ["mantenimiento correctivo", "adaptativo", "perfectivo", "evolutivo", "deuda técnica", "patrón estrangulador", "anticorruption layer"]
+        tecnologias: []
+        criterio_dominio: "Clasificar diez cambios reales según tipo de mantenimiento sin ambigüedad, y diseñar un plan de modernización por estrangulamiento para un sistema legado descrito."
+  - id: f4
+    nombre: "Nube: diseño de soluciones y equivalencias multinube"
+    horas: 75
+    certificacion_ancla: "AWS Certified Solutions Architect – Associate (SAA-C03) — programar después del examen del concurso"
+    criterio_dominio_fase: >
+      Desplegar una solución en la nube mediante infraestructura como código, con red segmentada,
+      base de datos gestionada, escalado automático y almacenamiento de objetos; entregar además una
+      tabla de equivalencias del diseño completo hacia un segundo proveedor y una estimación mensual
+      de costos con dos escenarios de carga.
+    capstone: "Migración a nube con infraestructura como código, alta disponibilidad, escalado automático, equivalencias multinube y estimación de costos."
+    topicos:
+      - id: f4.fundamentos-nube
+        nombre: "Fundamentos de nube y responsabilidad compartida"
+        tipo: conceptual
+        conceptos: ["regiones", "zonas de disponibilidad", "modelo de responsabilidad compartida", "elasticidad", "modelos de facturación"]
+        tecnologias: ["AWS"]
+        criterio_dominio: "Determinar para seis controles concretos quién responde (proveedor o entidad) en IaaS, PaaS y SaaS, y sustentar la elección de región para una entidad pública colombiana."
+      - id: f4.identidad-accesos
+        nombre: "Identidad, accesos y mínimo privilegio"
+        tipo: mixto
+        conceptos: ["usuarios y grupos", "roles", "políticas", "mínimo privilegio", "credenciales temporales", "federación"]
+        tecnologias: ["AWS IAM"]
+        criterio_dominio: "Escribir una política que otorgue exactamente el acceso necesario a un caso dado, demostrar que un permiso adicional queda denegado, y corregir una política sobrepermisiva entregada como ejercicio."
+      - id: f4.computo-almacenamiento
+        nombre: "Cómputo y almacenamiento gestionados"
+        tipo: mixto
+        conceptos: ["máquinas virtuales", "contenedores gestionados", "funciones sin servidor", "almacenamiento de objetos, bloques y archivos", "clases de almacenamiento", "políticas de ciclo de vida"]
+        tecnologias: ["AWS EC2", "AWS Lambda", "AWS S3"]
+        criterio_dominio: "Elegir servicio de cómputo y de almacenamiento para cuatro cargas distintas con sustento de costo y desempeño, e implementar una política de ciclo de vida que degrade objetos a clase fría."
+      - id: f4.redes-nube
+        nombre: "Redes en la nube y conectividad híbrida"
+        tipo: mixto
+        conceptos: ["red virtual", "subredes públicas y privadas", "tablas de ruta", "gateway NAT", "grupos de seguridad", "conectividad híbrida"]
+        tecnologias: ["AWS VPC"]
+        criterio_dominio: "Diseñar y desplegar una red con subredes públicas y privadas donde la capa de datos no tenga salida directa a internet, y demostrarlo con una prueba de conectividad."
+      - id: f4.datos-desacoplamiento
+        nombre: "Bases de datos gestionadas, escalado y desacoplamiento"
+        tipo: mixto
+        conceptos: ["base de datos gestionada", "réplicas de lectura", "multi-AZ", "escalado automático", "balanceo", "colas y notificaciones gestionadas"]
+        tecnologias: ["AWS RDS", "AWS SQS", "AWS Auto Scaling"]
+        criterio_dominio: "Desplegar una base gestionada con alta disponibilidad y un componente desacoplado por cola, y demostrar el comportamiento del sistema ante una caída de la instancia primaria."
+      - id: f4.pilares-arquitectura
+        nombre: "Los cinco pilares de la buena arquitectura"
+        tipo: conceptual
+        conceptos: ["excelencia operativa", "seguridad", "fiabilidad", "eficiencia de desempeño", "optimización de costos", "revisión por pilares"]
+        tecnologias: []
+        criterio_dominio: "Revisar una arquitectura dada contra los cinco pilares, listar al menos dos hallazgos por pilar y priorizarlos por riesgo y costo de remediación."
+      - id: f4.equivalencias-multinube
+        nombre: "Equivalencias entre proveedores de nube"
+        tipo: conceptual
+        conceptos: ["equivalencia de cómputo", "almacenamiento de objetos", "funciones", "red virtual", "identidad", "base de datos gestionada", "portabilidad y bloqueo de proveedor"]
+        tecnologias: ["AWS", "Azure"]
+        criterio_dominio: "Traducir una arquitectura completa de AWS a Azure servicio por servicio, señalando las dos equivalencias imperfectas y qué habría que rediseñar en cada una."
+      - id: f4.iac-costos
+        nombre: "Infraestructura como código y control de costos"
+        tipo: codigo
+        conceptos: ["declarativo vs imperativo", "estado de infraestructura", "módulos", "idempotencia", "estimación de costos", "etiquetado y control de gasto"]
+        tecnologias: ["Terraform"]
+        criterio_dominio: "Levantar y destruir la arquitectura completa con Terraform de forma reproducible, y entregar la estimación mensual de costos con dos escenarios de carga."
+  - id: f5
+    nombre: "Seguridad de la información y del ciclo de vida"
+    horas: 50
+    certificacion_ancla: null
+    criterio_dominio_fase: >
+      Entregar un modelo de amenazas STRIDE de la solución construida, con al menos 10 amenazas
+      identificadas, sus controles implementados o planificados y el riesgo residual; más el informe
+      de un análisis de vulnerabilidades ejecutado sobre el despliegue real con su plan de mitigación
+      priorizado.
+    capstone: "Modelo de amenazas, controles, cifrado, gestión de identidad, análisis de vulnerabilidades y plan de continuidad del sistema."
+    topicos:
+      - id: f5.cia-activos
+        nombre: "Confidencialidad, integridad, disponibilidad y activos de información"
+        tipo: conceptual
+        conceptos: ["tríada CIA", "activo de información", "inventario de activos", "clasificación de la información", "riesgo y riesgo residual"]
+        tecnologias: []
+        criterio_dominio: "Levantar el inventario de activos de información del sistema con su clasificación y valorar el impacto de la pérdida de cada propiedad de la tríada."
+      - id: f5.criptografia
+        nombre: "Criptografía aplicada y gestión de llaves"
+        tipo: codigo
+        conceptos: ["simétrica", "asimétrica", "hashing y salting", "certificados", "cifrado en tránsito", "cifrado en reposo", "gestión de llaves"]
+        tecnologias: ["openssl", "gestor de secretos"]
+        criterio_dominio: "Implementar cifrado en reposo de un campo sensible y almacenamiento correcto de contraseñas, y explicar por qué un hash sin sal es insuficiente demostrándolo."
+      - id: f5.autenticacion-autorizacion
+        nombre: "Autenticación, autorización y federación"
+        tipo: codigo
+        conceptos: ["OAuth 2.0", "OpenID Connect", "JWT", "MFA", "federación de identidad", "sesiones y expiración"]
+        tecnologias: ["Keycloak o equivalente", "JWT"]
+        criterio_dominio: "Proteger la API de expedientes con un flujo OAuth 2.0, validar el token en el servidor y demostrar el rechazo de un token expirado y de uno con firma alterada."
+      - id: f5.owasp-amenazas
+        nombre: "OWASP Top 10 y modelado de amenazas"
+        tipo: mixto
+        conceptos: ["OWASP Top 10", "STRIDE", "superficie de ataque", "diagramas de flujo de datos", "controles y riesgo residual"]
+        tecnologias: ["OWASP ZAP"]
+        criterio_dominio: "Producir el modelo STRIDE del sistema con al menos 10 amenazas, sus controles y riesgo residual, y explotar una vulnerabilidad OWASP en un entorno controlado antes de corregirla."
+      - id: f5.seguridad-sdlc
+        nombre: "Seguridad en el ciclo de vida del desarrollo"
+        tipo: codigo
+        conceptos: ["análisis estático", "análisis dinámico", "gestión de dependencias", "manejo de secretos", "DevSecOps", "puertas de calidad"]
+        tecnologias: ["Trivy o Dependabot", "análisis estático", "GitHub Actions"]
+        criterio_dominio: "Integrar análisis estático y escaneo de dependencias en la canalización, y demostrar que el pipeline falla ante un secreto expuesto y ante una dependencia vulnerable."
+      - id: f5.vulnerabilidades-incidentes
+        nombre: "Análisis de vulnerabilidades y gestión de incidentes"
+        tipo: codigo
+        conceptos: ["escaneo de vulnerabilidades", "priorización por criticidad", "plan de mitigación", "detección y respuesta", "lecciones aprendidas"]
+        tecnologias: ["OWASP ZAP", "Trivy"]
+        criterio_dominio: "Ejecutar un análisis de vulnerabilidades sobre el despliegue real y entregar el informe con hallazgos priorizados, plan de mitigación y responsables."
+      - id: f5.continuidad
+        nombre: "Continuidad del negocio y recuperación ante desastres"
+        tipo: conceptual
+        conceptos: ["análisis de impacto al negocio", "plan de continuidad", "plan de recuperación ante desastres", "pruebas de continuidad", "estrategias de recuperación por costo"]
+        tecnologias: []
+        criterio_dominio: "Elaborar el análisis de impacto del sistema y diseñar dos estrategias de recuperación con costos y RTO distintos, recomendando una con su sustento."
+      - id: f5.mspi-datos-personales
+        nombre: "MSPI de MinTIC y protección de datos personales"
+        tipo: conceptual
+        conceptos: ["Modelo de Seguridad y Privacidad de la Información", "ciclo de operación del MSPI", "ISO 27001", "Ley 1581 de 2012", "autorización y habeas data", "aviso de privacidad"]
+        tecnologias: []
+        criterio_dominio: "Mapear los controles implementados en el sistema contra las fases del MSPI y redactar la política de tratamiento de datos personales aplicable, citando la norma que sustenta cada obligación."
+  - id: f6
+    nombre: "Arquitectura empresarial: TOGAF y MRAE"
+    horas: 65
+    certificacion_ancla: "TOGAF Enterprise Architecture Foundation (OGEA-101) — programar después del examen del concurso"
+    criterio_dominio_fase: >
+      Producir un ejercicio de arquitectura empresarial completo para una entidad pública ficticia:
+      arquitectura actual (AS-IS) y objetivo (TO-BE) modeladas en ArchiMate sobre los cinco dominios
+      del MAE, análisis de brecha, mapa de ruta priorizado, y un anexo que mapee cada decisión contra
+      el lineamiento del MRAE que la sustenta. Debe incluir el diseño de un servicio de intercambio
+      de información conforme al Marco de Interoperabilidad, con su nivel de madurez declarado.
+    capstone: "El sistema ubicado en una arquitectura empresarial AS-IS/TO-BE de la entidad, con análisis de brecha, mapa de ruta y un servicio de intercambio conforme al Marco de Interoperabilidad."
+    topicos:
+      - id: f6.tipos-arquitectura
+        nombre: "Arquitectura de solución, empresarial y de sistemas"
+        tipo: conceptual
+        conceptos: ["arquitectura de solución", "arquitectura empresarial", "arquitectura de sistemas de información", "alcance y horizonte", "rol del arquitecto"]
+        tecnologias: []
+        criterio_dominio: "Clasificar diez decisiones reales según el tipo de arquitectura que las gobierna y justificar las tres que resulten ambiguas."
+      - id: f6.togaf-adm
+        nombre: "TOGAF y el ciclo ADM"
+        tipo: conceptual
+        conceptos: ["arquitectura de negocio, datos, aplicaciones y tecnología", "fases del ADM", "repositorio de arquitectura", "building blocks", "gobierno de arquitectura"]
+        tecnologias: []
+        criterio_dominio: "Recorrer el ADM aplicado a un caso concreto indicando entrada, salida y decisión clave de cada fase, sin omitir la fase de gestión de requisitos."
+      - id: f6.archimate
+        nombre: "Modelado con ArchiMate"
+        tipo: mixto
+        conceptos: ["capas de negocio, aplicación y tecnología", "elementos y relaciones", "vistas y viewpoints", "trazabilidad entre capas"]
+        tecnologias: ["Archi"]
+        criterio_dominio: "Modelar en ArchiMate la arquitectura actual del sistema con las tres capas y trazabilidad explícita entre un servicio de negocio y el componente tecnológico que lo soporta."
+      - id: f6.mrae-mae
+        nombre: "MRAE v3.0 y los cinco dominios del MAE"
+        tipo: conceptual
+        conceptos: ["Resolución 1978 de 2023", "Modelo de Arquitectura Empresarial", "arquitectura institucional", "de información", "de sistemas de información", "tecnológica", "de seguridad", "lineamientos"]
+        tecnologias: []
+        criterio_dominio: "Clasificar quince lineamientos del MAE en su dominio correspondiente y aplicar cinco de ellos a decisiones concretas del proyecto, citando el lineamiento en cada caso."
+      - id: f6.mggti-peti
+        nombre: "Gestión y gobierno de TI — MGGTI y PETI"
+        tipo: conceptual
+        conceptos: ["Modelo de Gestión y Gobierno de TI", "Modelo de Gestión de Proyectos de TI", "PETI", "alineación con el plan estratégico institucional", "catálogo de servicios de TI"]
+        tecnologias: []
+        criterio_dominio: "Redactar la sección de un PETI que justifique el proyecto: situación actual, objetivo, alineación estratégica, iniciativas y su secuencia en el mapa de ruta."
+      - id: f6.gobierno-digital
+        nombre: "Política de Gobierno Digital"
+        tipo: conceptual
+        conceptos: ["habilitadores: arquitectura, seguridad y privacidad, servicios ciudadanos digitales", "propósitos", "TIC para el Estado y para la sociedad", "Decreto 1008 de 2018", "servicios ciudadanos digitales"]
+        tecnologias: []
+        criterio_dominio: "Ubicar el proyecto dentro de la estructura de la Política de Gobierno Digital indicando qué habilitador y qué propósito atiende, y qué evidencia probaría el cumplimiento."
+      - id: f6.interoperabilidad
+        nombre: "Marco de Interoperabilidad y servicios de intercambio"
+        tipo: mixto
+        conceptos: ["dominio político-legal", "organizacional", "semántico", "técnico", "modelo de madurez de cinco niveles", "lenguaje común de intercambio", "plataforma de interoperabilidad y X-Road"]
+        tecnologias: ["OpenAPI"]
+        criterio_dominio: "Diseñar un servicio de intercambio de información entre dos entidades cubriendo los cuatro dominios del Marco, con su contrato de interfaz y el nivel de madurez declarado y sustentado."
+      - id: f6.itil-apropiacion
+        nombre: "Gestión de servicios de TI y uso y apropiación"
+        tipo: conceptual
+        conceptos: ["gestión de incidentes", "problemas", "cambios", "comité de cambios", "acuerdos de nivel de servicio", "gestión del cambio organizacional", "transferencia de conocimiento"]
+        tecnologias: []
+        criterio_dominio: "Definir el proceso de gestión de cambios del sistema con criterios de aprobación y análisis de impacto, más el plan de uso y apropiación para los usuarios de la entidad."
+  - id: f7
+    nombre: "Marco jurídico y gestión pública de TI"
+    horas: 70
+    certificacion_ancla: "Cursos MinTIC (MRAE, Gobierno Digital) y Colombia Compra Eficiente (SECOP II) — hito verificable"
+    criterio_dominio_fase: >
+      Estructurar los estudios previos completos para contratar una solución tecnológica: necesidad,
+      análisis del sector con al menos 3 procesos comparables extraídos de SECOP II, especificaciones
+      técnicas derivadas de la arquitectura diseñada, modalidad de selección elegida y sustentada
+      normativamente, matriz de riesgos, y presupuesto oficial justificado. Complementar con un
+      cuadro que ubique cada norma citada dentro de la jerarquía normativa.
+    capstone: "Estudios previos completos para contratar la construcción del sistema, con modalidad de selección, matriz de riesgos y presupuesto sustentado."
+    topicos:
+      - id: f7.estado-ministerio-publico
+        nombre: "Estructura del Estado y Ministerio Público"
+        tipo: conceptual
+        conceptos: ["ramas del poder público", "órganos de control", "función administrativa (art. 209)", "Ministerio Público (arts. 275-284)", "jerarquía normativa"]
+        tecnologias: []
+        criterio_dominio: "Ubicar en un esquema el órgano de control dentro de la estructura del Estado y resolver cinco casos indicando qué entidad tiene competencia y con qué fundamento constitucional."
+      - id: f7.decreto-ley-262
+        nombre: "Régimen del organismo de control (Decreto Ley 262 de 2000)"
+        tipo: conceptual
+        conceptos: ["estructura de la entidad", "funciones", "planta globalizada", "carrera administrativa", "listas de elegibles", "reclamaciones y recursos"]
+        tecnologias: []
+        criterio_dominio: "Responder diez preguntas de aplicación sobre estructura, competencias y régimen de carrera citando el artículo exacto que sustenta cada respuesta."
+      - id: f7.contratacion-estatal
+        nombre: "Contratación estatal — principios y modalidades"
+        tipo: conceptual
+        conceptos: ["Ley 80 de 1993", "Ley 1150 de 2007", "Decreto 1082 de 2015", "licitación pública", "selección abreviada", "concurso de méritos", "mínima cuantía", "contratación directa", "supervisión e interventoría"]
+        tecnologias: []
+        criterio_dominio: "Determinar la modalidad de selección correcta para ocho contrataciones de TI distintas y sustentar cada una con la norma aplicable y su cuantía o causal."
+      - id: f7.estudios-previos-ti
+        nombre: "Estructuración de un proceso de contratación de TI"
+        tipo: mixto
+        conceptos: ["estudios previos", "análisis del sector", "especificaciones técnicas", "criterios de evaluación", "matriz de riesgos", "garantías", "acuerdos marco de precios"]
+        tecnologias: ["SECOP II"]
+        criterio_dominio: "Producir los estudios previos completos de una contratación de TI con análisis del sector basado en al menos tres procesos reales consultados en SECOP II."
+      - id: f7.presupuesto-publico
+        nombre: "Presupuesto público y ejecución"
+        tipo: conceptual
+        conceptos: ["Estatuto Orgánico del Presupuesto", "principios presupuestales", "ciclo presupuestal", "CDP", "registro presupuestal", "vigencias futuras"]
+        tecnologias: []
+        criterio_dominio: "Trazar el recorrido presupuestal completo de un proyecto de TI desde su programación hasta el pago, indicando qué documento habilita cada paso y qué pasa si falta."
+      - id: f7.formulacion-proyectos
+        nombre: "Formulación y evaluación de proyectos públicos"
+        tipo: mixto
+        conceptos: ["metodología de marco lógico", "árbol de problemas y objetivos", "MGA del DNP", "indicadores de producto y resultado", "evaluación ex ante"]
+        tecnologias: []
+        criterio_dominio: "Formular el proyecto del sistema con árbol de problemas, objetivos, indicadores de producto y resultado, y la cadena de valor completa."
+      - id: f7.normatividad-tic
+        nombre: "Normatividad TIC y transparencia"
+        tipo: conceptual
+        conceptos: ["Ley 1341 de 2009", "Decreto 1078 de 2015", "Ley 1712 de 2014", "datos abiertos", "sede electrónica (Ley 1437, art. 60)", "IPv6 y estándares obligatorios"]
+        tecnologias: []
+        criterio_dominio: "Construir el normograma de TI aplicable al proyecto, indicando por cada norma qué obligación concreta impone al diseño y cómo se evidencia su cumplimiento."
+      - id: f7.gestion-documental-mipg
+        nombre: "Gestión documental y sistemas de gestión"
+        tipo: conceptual
+        conceptos: ["Ley 594 de 2000", "tablas de retención documental", "expediente electrónico", "MIPG", "MECI", "control interno", "planes de mejoramiento"]
+        tecnologias: []
+        criterio_dominio: "Definir la tabla de retención aplicable a los documentos que produce el sistema y mapear sus controles contra las dimensiones de MIPG y los componentes del MECI."
+  - id: f8
+    nombre: "Integración: defensa de arquitectura y prueba de conocimientos"
+    horas: 40
+    certificacion_ancla: null
+    criterio_dominio_fase: >
+      Sostener tres simulacros completos cronometrados con al menos 80 % de acierto en cada bloque
+      temático (técnico, arquitectura empresarial, jurídico-administrativo), y presentar una defensa
+      oral de 10 minutos de la arquitectura del proyecto transversal ante audiencia no técnica,
+      respondiendo preguntas sobre costo, riesgo y sustento normativo.
+    capstone: "Defensa oral del proyecto completo ante audiencia no técnica, en 10 minutos."
+    topicos:
+      - id: f8.casos-restricciones
+        nombre: "Casos de arquitectura con restricciones cruzadas"
+        tipo: mixto
+        conceptos: ["restricción dominante", "presupuesto vs disponibilidad", "legado vs modernización", "plazo vs alcance", "decisión bajo incertidumbre"]
+        tecnologias: []
+        criterio_dominio: "Resolver tres casos donde presupuesto, normativa y plazo se contradicen, entregando por cada uno la decisión, la restricción que la dominó y lo que se sacrificó."
+      - id: f8.comunicacion-no-tecnica
+        nombre: "Comunicación de arquitectura a audiencias no técnicas"
+        tipo: conceptual
+        conceptos: ["traducción de atributos técnicos a riesgo institucional", "costo de la disponibilidad", "estructura de una recomendación", "manejo de preguntas hostiles"]
+        tecnologias: []
+        criterio_dominio: "Reescribir una recomendación técnica de una página en lenguaje de decisión institucional, con costo, riesgo y consecuencia de no actuar, sin perder precisión técnica."
+      - id: f8.tecnica-examen
+        nombre: "Técnica de examen de opción múltiple"
+        tipo: mixto
+        conceptos: ["descarte por eliminación", "identificación de la restricción dominante en el enunciado", "distractores frecuentes", "gestión del tiempo por pregunta", "cuándo saltar una pregunta"]
+        tecnologias: []
+        criterio_dominio: "Resolver un bloque de 30 preguntas cronometrado explicando por escrito, en cinco de ellas, por qué cada opción descartada era incorrecta."
+      - id: f8.competencias-comportamentales
+        nombre: "Competencias comportamentales de la convocatoria"
+        tipo: conceptual
+        conceptos: ["diccionario de competencias de la entidad", "niveles de competencia", "investigación", "pensamiento conceptual", "orientación a resultados", "cumplimiento de parámetros de trabajo"]
+        tecnologias: []
+        criterio_dominio: "Describir para cada competencia de la convocatoria una conducta observable propia que la evidencie en el nivel exigido, contrastada contra el diccionario oficial."
+      - id: f8.simulacros
+        nombre: "Simulacros completos y refuerzo dirigido"
+        tipo: mixto
+        conceptos: ["simulacro cronometrado", "análisis de errores por bloque", "reasignación de horas por resultado", "curva de olvido y repaso final"]
+        tecnologias: []
+        criterio_dominio: "Sostener tres simulacros completos con al menos 80 % de acierto por bloque temático, y entregar tras cada uno el análisis de errores con la reasignación de estudio que generó."

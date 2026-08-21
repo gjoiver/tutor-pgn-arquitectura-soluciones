@@ -1,0 +1,34 @@
+# Secretos y datos locales
+.env
+data/
+
+# Claude Code (config local de esta máquina)
+.claude/settings.local.json
+
+# Obsidian: se versiona material/.obsidian/ (config compartida entre PCs),
+# pero no el estado volátil de ventanas/paneles de cada máquina
+material/.obsidian/workspace.json
+material/.obsidian/workspace-mobile.json
+
+# SO / editor
+.DS_Store
+
+# Stack del tema (Arquitectura de Soluciones para el Estado colombiano)
+__pycache__/
+.venv/
+*.pyc
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Bases de datos y volcados locales
+*.dump
+*.sql.bak
+pgdata/
+
+# Archi / ArchiMate
+*.bak
+.archi*/
